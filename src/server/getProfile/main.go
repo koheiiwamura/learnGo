@@ -40,7 +40,7 @@ func Profile(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	case "Alice":
 		responsePerson = Alice
 	default:
-		http.Error(w, fmt.Sprintf("%d bad Request", http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Not found %s", name), http.StatusNotFound)
 	}
 
 	jsonBytes, _ := json.Marshal(responsePerson)
