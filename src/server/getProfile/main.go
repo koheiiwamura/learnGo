@@ -10,10 +10,10 @@ import (
 )
 
 type Person struct {
-	Name         string
-	Age          int
-	Gender       string
-	FavoriteFood []string
+	Name         string   `json:"name"`
+	Age          int      `json:"age"`
+	Gender       string   `json:"gender"`
+	FavoriteFood []string `json:"favorite_foods"`
 }
 
 var Bob = Person{
