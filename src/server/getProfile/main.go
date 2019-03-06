@@ -43,7 +43,10 @@ func Profile(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		http.Error(w, fmt.Sprintf("Not found %s", name), http.StatusNotFound)
 	}
 
-	jsonBytes, _ := json.Marshal(responsePerson)
+	jsonBytes, err := json.Marshal(responsePerson)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	jsonStr := string(jsonBytes)
 	fmt.Fprintf(w, jsonStr)
 }
