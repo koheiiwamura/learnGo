@@ -31,6 +31,7 @@ func ProfileAdd(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	for i := 0; i < len(Persons); i++ {
 		if Persons[i].Name == storePerson.Name {
 			http.Error(w, fmt.Sprintf("%d bad Request", http.StatusBadRequest), http.StatusBadRequest)
+			return
 		}
 	}
 	Persons = append(Persons, storePerson)
