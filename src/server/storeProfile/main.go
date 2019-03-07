@@ -40,6 +40,7 @@ func ProfileAdd(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	log.Printf("\nnum of Persons: %d\n", len(Persons))
 	// 201を返答
 	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(fmt.Sprintf("%d created", http.StatusCreated)))
 }
 
 func main() {
