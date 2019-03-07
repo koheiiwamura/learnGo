@@ -20,6 +20,8 @@ var Persons []Person
 
 func ProfileAdd(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
+	defer r.Body.Close()
+
 	var storePerson Person
 	// 構造体に当てはめる
 	var decode_err = json.NewDecoder(r.Body).Decode(&storePerson)
