@@ -20,12 +20,12 @@ var Persons []Person
 
 func ProfileAdd(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
-	// 引数をdecode
-	decoder := json.NewDecoder(r.Body)
-
 	var storePerson Person
 	// 構造体に当てはめる
-	decoder.Decode(&storePerson)
+	var decode_err = json.NewDecoder(r.Body).Decode(&storePerson)
+	if decode_err != nil {
+		http.Error(w, fmt.Sprintf("%d bad Request", http.StatusBadRequest), http.StatusBadRequest)
+	}
 
 	// 過去のPersonと名前が被らないかチェックする
 	for i := 0; i < len(Persons); i++ {
