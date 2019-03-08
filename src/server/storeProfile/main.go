@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"reflect"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -38,11 +39,15 @@ func ProfileAdd(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 	Persons = append(Persons, storePerson)
 	// 確認用のログを出力しておく
-	log.Printf("\nname: %s\nage: %d\ngender: %s\nfavorite_foods: %s\n", storePerson.Name, storePerson.Age, storePerson.Gender, storePerson.FavoriteFood)
 	log.Printf("\nnum of Persons: %d\n", len(Persons))
 	// 201を返答
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(fmt.Sprintf("%d created", http.StatusCreated)))
+	json_bytes, err := json.Marshal(storePerson)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%d Internal Server Error", http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+	fmt.Println(reflect.ValueOf(json_bytes).Type())
+	w.Write([]byte(string(json_bytes)))
 }
 
 func main() {
