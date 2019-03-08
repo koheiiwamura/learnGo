@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"reflect"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -17,7 +16,22 @@ type Person struct {
 	FavoriteFood []string `json:"favorite_foods"`
 }
 
-var Persons []Person
+var Persons map[string]Person = map[string]Person{}
+
+func profileDetail(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	name := p.ByName("name")
+	responsePerson, notFound := Persons[name]
+
+	if !notFound {
+		http.Error(w, fmt.Sprintf("Not found %s", name), http.StatusNotFound)
+		return
+	}
+	jsonBytes, err := json.Marshal(responsePerson)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Write([]byte(string(string(jsonBytes))))
+}
 
 func ProfileAdd(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
@@ -28,16 +42,16 @@ func ProfileAdd(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	var decode_err = json.NewDecoder(r.Body).Decode(&storePerson)
 	if decode_err != nil {
 		http.Error(w, fmt.Sprintf("%d bad Request", http.StatusBadRequest), http.StatusBadRequest)
+		return
 	}
 
 	// 過去のPersonと名前が被らないかチェックする
-	for i := 0; i < len(Persons); i++ {
-		if Persons[i].Name == storePerson.Name {
-			http.Error(w, fmt.Sprintf("%d bad Request", http.StatusBadRequest), http.StatusBadRequest)
-			return
-		}
+	_, alreadyExists := Persons[storePerson.Name]
+	if alreadyExists {
+		http.Error(w, fmt.Sprintf("%d bad Request", http.StatusBadRequest), http.StatusBadRequest)
+		return
 	}
-	Persons = append(Persons, storePerson)
+	Persons[storePerson.Name] = storePerson
 	// 確認用のログを出力しておく
 	log.Printf("\nnum of Persons: %d\n", len(Persons))
 	// 201を返答
@@ -45,8 +59,9 @@ func ProfileAdd(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	json_bytes, err := json.Marshal(storePerson)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%d Internal Server Error", http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
-	fmt.Println(reflect.ValueOf(json_bytes).Type())
+	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(string(json_bytes)))
 }
 
@@ -54,6 +69,8 @@ func main() {
 	router := httprouter.New() // HTTPルーターを初期化
 
 	router.POST("/Profile/add", ProfileAdd)
+
+	router.GET("/Profile/:name", profileDetail)
 
 	// Webサーバーを8080ポートで立ち上げる
 	err := http.ListenAndServe(":8080", router)
