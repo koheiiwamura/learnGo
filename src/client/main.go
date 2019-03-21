@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -28,7 +29,11 @@ func callGetProfile(name string) {
 		log.Fatal(err)
 	}
 	defer response.Body.Close()
-	fmt.Println(response)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(body))
 	return
 }
 
@@ -56,7 +61,11 @@ func callStoreProfile(name string, age int, gender string, favoriteFoods string)
 		log.Fatal(err)
 	}
 	defer response.Body.Close()
-	fmt.Println(response)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(body))
 	return
 }
 
