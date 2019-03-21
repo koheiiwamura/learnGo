@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+const host = "http://localhost:8080/Profile/"
+
 type Person struct {
 	Name         string   `json:"name"`
 	Age          int      `json:"age"`
@@ -18,10 +20,13 @@ type Person struct {
 }
 
 func callGetProfile(name string) {
-	url := "http://localhost:8080/Profile/" + name
+	url := host + name
 	req, _ := http.NewRequest("GET", url, nil)
 	client := new(http.Client)
-	response, _ := client.Do(req)
+	response, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer response.Body.Close()
 	fmt.Println(response)
 	return
@@ -40,10 +45,16 @@ func callStoreProfile(name string, age int, gender string, favoriteFoods string)
 	if err != nil {
 		log.Fatal(err)
 	}
-	url := "http://localhost:8080/Profile/add/"
-	req, _ := http.NewRequest("POST", url, bytes.NewBuffer([]byte(jsonStr)))
+	url := host + "add/"
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(jsonStr)))
+	if err != nil {
+		log.Fatal(err)
+	}
 	client := new(http.Client)
-	response, _ := client.Do(req)
+	response, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer response.Body.Close()
 	fmt.Println(response)
 	return
