@@ -22,12 +22,9 @@ func main() {
 
 	// 受信、もしくは close したことを検知するために使われている(今回はcloseされる)
 	<-done
-
 	// close したことを検知するために使われている(会話中に受信は行われるので、<-done を手前に置いている)
 	<-ch
-
 	fmt.Println("会話完了")
-
 }
 
 func kent(ch chan MessageTo, done chan bool) {
@@ -63,7 +60,7 @@ func kent(ch chan MessageTo, done chan bool) {
 
 func yukpiz(ch chan MessageTo, done chan bool) {
 	texts := []string{"私はゆくぴずです", "よろしくおねがいします", "行きましょう"}
-	// 最初はkentから始めるため(非同期処理で)
+	// deadlockの発生を防ぐため。
 	ch <- MESSAGE_TO_KENT
 	// ch が close されたらループを抜ける
 	for v := range ch {
